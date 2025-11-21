@@ -5,7 +5,7 @@
   "avatarUrl": "https://cdn.staticaly.com/gh/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494/docs/images/landing-page/github-logo.svg",
   "faviconUrl": "https://cdn.staticaly.com/gh/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494/docs/images/landing-page/github-logo.svg",
   "ogImage": "https://cdn.staticaly.com/gh/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494/docs/images/landing-page/github-logo.svg",
-  "email": "137881976@qq.com",  // 必须替换为你的邮箱
+  "email": "your-github-email@example.com",
   "i18n": "CN",
   "themeMode": "manual",
   "dayTheme": "light",
