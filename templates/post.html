@@ -1,201 +1,108 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ blogBase.postTitle }} - {{ blogBase.displayTitle }}</title>
+    <meta name="description" content="{{ blogBase.description }}">
+    <meta property="og:title" content="{{ blogBase.postTitle }}">
+    <meta property="og:description" content="{{ blogBase.description }}">
+    <meta property="og:image" content="{{ blogBase.ogImage }}">
+    <meta property="og:url" content="{{ blogBase.postUrl }}">
+    <link rel="icon" href="{{ blogBase.faviconUrl }}">
+    {{ blogBase.primerCSS|safe }}
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .header { text-align: center; padding: 20px 0; border-bottom: 1px solid #eee; }
+        .title { font-size: 2rem; margin-bottom: 10px; color: #2c3e50; }
+        .post-meta { display: flex; justify-content: center; gap: 20px; color: #7f8c8d; font-size: 0.9rem; margin: 20px 0; }
+        .post-date { display: inline-block; padding: 2px 8px; border-radius: 4px; color: white; background-color: {{ blogBase.dateLabelColor }}; }
+        .post-tags { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
+        .post-tag { padding: 2px 8px; border-radius: 4px; background-color: #f1f5f9; color: #333; font-size: 0.8rem; }
+        .post-content { margin: 40px 0; line-height: 1.8; color: #34495e; font-size: 1.1rem; }
+        .post-content h1, .post-content h2, .post-content h3 { margin: 20px 0; color: #2c3e50; }
+        .post-content img { max-width: 100%; height: auto; border-radius: 4px; margin: 10px 0; }
+        .post-content a { color: #3498db; text-decoration: none; }
+        .post-content a:hover { text-decoration: underline; }
+        .post-content blockquote { border-left: 4px solid #ddd; padding: 0 15px; color: #7f8c8d; margin: 10px 0; }
+        .post-content pre { background-color: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto; margin: 10px 0; }
+        .post-content code { background-color: #f8f9fa; padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+        .nav { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
+        .nav-item { display: flex; align-items: center; gap: 5px; color: #3498db; text-decoration: none; }
+        .nav-item:hover { color: #2980b9; text-decoration: underline; }
+        .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #7f8c8d; margin-top: 40px; }
+        .source-link { margin: 20px 0; text-align: center; }
+        .source-link a { color: #3498db; text-decoration: none; }
+        .icon { width: 16px; height: 16px; display: inline-block; }
+        .comment-count { display: inline-flex; align-items: center; gap: 5px; }
+    </style>
+    {{ blogBase.style|safe }}
+    {{ blogBase.allHead|safe }}
+    {{ blogBase.head|safe }}
+</head>
+<body>
+    <div class="container">
+        <!-- 导航 -->
+        <nav class="nav">
+            {% for key, svg in IconList.items() %}
+                {% if key == 'home' %}
+                    <a href="{{ blogBase.homeUrl }}" class="nav-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="{{ svg }}" />
+                        </svg>
+                        {{ i18n.home }}
+                    </a>
+                {% elif key == 'github' and blogBase.showPostSource %}
+                    <a href="{{ blogBase.postSourceUrl }}" target="_blank" class="nav-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="{{ svg }}" />
+                        </svg>
+                        {{ i18n.comments }} ({{ blogBase.commentNum }})
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </nav>
 
-{% block head %}
-<meta name="description" content="{{ blogBase['description'] }}">
-<meta property="og:title" content="{{ blogBase['postTitle'] }}">
-<meta property="og:description" content="{{ blogBase['description'] }}">
-<meta property="og:type" content="article">
-<meta property="og:url" content="{{ blogBase['postUrl'] }}">
-<meta property="og:image" content="{{ blogBase['ogImage'] }}">
-<title>{{ blogBase['postTitle'] }}</title>
-{% if blogBase['highlight']==1 %}<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />{% endif %}
-{{ blogBase['head'] }}
-{% endblock %}
+        <!-- 文章标题 -->
+        <header class="header">
+            <h1 class="title">{{ blogBase.postTitle }}</h1>
+            <div class="post-meta">
+                <span class="post-date">{{ blogBase.createdDate }}</span>
+                {% if blogBase.needComment %}
+                    <span class="comment-count">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="{{ IconBase.comments }}" />
+                        </svg>
+                        {{ i18n.comments }}: {{ blogBase.commentNum }}
+                    </span>
+                {% endif %}
+            </div>
+            <div class="post-tags">
+                {% for tag in blogBase.labels %}
+                    <span class="post-tag" style="background-color: {{ blogBase.labelColorDict.get(tag, '#f1f5f9') }}; color: white;">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </header>
 
-{% block style %}
-<style>
-.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
-.title-right{display:flex;margin:auto 0 0 auto;}
-.title-right .circle{padding: 14px 16px;margin-right:8px;}
-#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
-#postBody hr{height:2px;}
-#cmButton{height:48px;margin-top:48px;}
-#comments{margin-top:64px;}
-.g-emoji{font-size:24px;}
-@media (max-width: 600px) {
-    body {padding: 8px;}
-    .postTitle{font-size:24px;}
-}
-{% if blogBase['highlight']!=0 -%}
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}{% endif %}
-</style>
-{{ blogBase['style'] }}
+        <!-- 文章内容 -->
+        <article class="post-content">
+            {{ blogBase.postBody|safe }}
+        </article>
 
-{% endblock %}
-{% block header %}
-<h1 class="postTitle">{{ blogBase['postTitle'] }}</h1>
-<div class="title-right">
-    <a href="{{ blogBase['homeUrl'] }}" id="buttonHome" class="btn btn-invisible circle" title="{{ i18n['home'] }}">
-        <svg class="octicon" width="16" height="16">
-            <path id="pathHome" fill-rule="evenodd"></path>
-        </svg>
-    </a>
-    {% if blogBase['showPostSource']==1 %}
-    <a href="{{ blogBase['postSourceUrl'] }}" target="_blank" class="btn btn-invisible circle" title="Issue">
-        <svg class="octicon" width="16" height="16">
-            <path id="pathIssue" fill-rule="evenodd"></path>
-        </svg>
-    </a>
-    {% endif %}
+        <!-- 文章来源 -->
+        {% if blogBase.showPostSource %}
+            <div class="source-link">
+                <a href="{{ blogBase.postSourceUrl }}" target="_blank">查看原文 & 参与评论</a>
+            </div>
+        {% endif %}
 
-    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="{{ i18n['switchTheme'] }}" {%- if blogBase['themeMode']=='fix' -%}style="display:none;"{%- endif -%}>
-        <svg class="octicon" width="16" height="16" >
-            <path id="themeSwitch" fill-rule="evenodd"></path>
-        </svg>
-    </a>
+        <!-- 底部 -->
+        <footer class="footer">
+            <p>{{ blogBase.bottomText }}</p>
+            <p>Powered by <a href="https://github.com/Meekdai/Gmeek" target="_blank">Gmeek</a></p>
+        </footer>
+    </div>
 
-</div>
-{% endblock %}
-
-{% block content %}
-<div class="markdown-body" id="postBody">{{ blogBase['postBody'] }}</div>
-<div style="font-size:small;margin-top:8px;float:right;">{{ blogBase['bottomText'] }}</div>
-{% if blogBase['needComment']==1 %}
-<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">{{ i18n['comments'] }}</button>
-<div class="comments" id="comments"></div>
-{% endif %}
-{% endblock %}
-
-{% block script %}
-<script>
-document.getElementById("pathHome").setAttribute("d",IconList["home"]);
-{% if blogBase['showPostSource']==1 %}document.getElementById("pathIssue").setAttribute("d",IconList["github"]);{% endif %}
-{% if blogBase['commentNum']>0 -%}
-    cmButton=document.getElementById("cmButton");
-    span=document.createElement("span");
-    span.setAttribute("class","Counter");
-    span.innerHTML="{{ blogBase['commentNum'] }}";
-    cmButton.appendChild(span);
-{%- endif %}
-
-{% if blogBase['needComment']==1 %}
-function openComments(){
-    cm=document.getElementById("comments");
-    cmButton=document.getElementById("cmButton");
-    cmButton.disabled=true;
-    cmButton.innerHTML="loading";
-    span=document.createElement("span");
-    span.setAttribute("class","AnimatedEllipsis");
-    cmButton.appendChild(span);
-
-    script=document.createElement("script");
-    script.setAttribute("src","https://utteranc.es/client.js");
-    script.setAttribute("repo","{{ blogBase['repoName'] }}");
-    script.setAttribute("issue-term","title");
-    {% if blogBase['themeMode']=='manual' %}
-    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
-    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
-    else{script.setAttribute("theme","preferred-color-scheme");}
-    {% else %}
-    script.setAttribute("theme","{{ blogBase['nightTheme'] }}");
-    {% endif %}
-    script.setAttribute("crossorigin","anonymous");
-    script.setAttribute("async","");
-    cm.appendChild(script);
-
-    int=self.setInterval("iFrameLoading()",200);
-}
-
-function iFrameLoading(){
-    var utterances=document.getElementsByClassName('utterances');
-    if(utterances.length==1){
-        if(utterances[0].style.height!=""){
-            utterancesLoad=1;
-            int=window.clearInterval(int);
-            document.getElementById("cmButton").style.display="none";
-            console.log("utterances Load OK");
-        }
-    }
-}
-{%- endif %}
-
-{% if blogBase['highlight']!=0 -%}
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
-
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
-{%- endif %}
-
-</script>
-{{ blogBase['script'] }}
-{% endblock %}
+    {{ blogBase.script|safe }}
+</body>
+</html>
