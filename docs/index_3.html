@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>数字森林</title>
+    <!-- 引入Markdown解析库和代码高亮库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css">
     <style>
         body { max-width: 1200px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; }
         .header { text-align: center; margin-bottom: 50px; }
@@ -35,13 +39,45 @@
             pointer-events: none;
             background-color: #f1f1f1;
         }
+        /* Markdown样式增强 */
+        .post-content h1 { font-size: 1.8em; margin: 1.5em 0 1em; }
+        .post-content h2 { font-size: 1.5em; margin: 1.2em 0 0.8em; }
+        .post-content h3 { font-size: 1.2em; margin: 1em 0 0.6em; }
+        .post-content ul, .post-content ol { margin: 1em 0; padding-left: 2em; }
+        .post-content li { margin: 0.5em 0; }
+        .post-content p { margin: 1em 0; }
+        .post-content blockquote { 
+            border-left: 4px solid #ddd; 
+            padding-left: 1em; 
+            margin: 1em 0; 
+            color: #666;
+        }
+        .post-content code { 
+            background: #f5f5f5; 
+            padding: 0.2em 0.4em; 
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .post-content pre { 
+            background: #f5f5f5; 
+            padding: 1em; 
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        .post-content pre code { 
+            padding: 0;
+            background: none;
+        }
+        .post-content a { color: #2c3e50; text-decoration: underline; }
+        .post-content img { max-width: 100%; margin: 1em 0; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>数字森林</h1>
         <p>数字森林的世界</p>
-        <p>作者：数字森林 | 最后更新：2025-11-21 06:19:07</p>
+        <p>作者：数字森林 | 最后更新：2025-11-21 06:28:23</p>
     </div>
 
     <div class="posts">
@@ -67,6 +103,23 @@
     <div class="footer">
         <p>数字的世界 | <a href="https://ruihan.xin" target="_blank">数字森林</a></p>
     </div>
+
+    <script>
+        // 页面加载完成后解析所有Markdown内容
+        document.addEventListener('DOMContentLoaded', function() {
+            // 解析文章内容
+            document.querySelectorAll('.post-content').forEach(function(element) {
+                const markdown = element.textContent;
+                const html = marked.parse(markdown);
+                element.innerHTML = html;
+            });
+            
+            // 代码高亮处理
+            document.querySelectorAll('pre code').forEach(function(block) {
+                hljs.highlightElement(block);
+            });
+        });
+    </script>
 </body>
 </html>
     
