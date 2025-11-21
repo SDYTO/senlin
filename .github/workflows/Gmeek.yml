@@ -48,4 +48,22 @@ jobs:
           echo "====== 开始执行 Gmeek 生成脚本 ======"
           # 处理 issue_number（为空时传空字符串）
           ISSUE_NUM="${{ github.event.issue.number || '' }}"
-          if [ -z
+          # 执行核心脚本（传参：github_token、repo_name、--issue_number）
+          python Gmeek.py "${{ secrets.GITHUB_TOKEN }}" "${{ github.repository }}" --issue_number "$ISSUE_NUM"
+          echo "====== 脚本执行完成 ======"
+
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs  # 部署目录（与脚本中 root_dir 一致）
+          publish_branch: gh-pages  # 部署分支（默认 gh-pages）
+          force_orphan: true  # 强制覆盖旧部署（避免冲突）
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+
+      - name: 输出部署结果
+        run: |
+          echo "🎉 博客部署完成！"
+          echo "📦 部署目录：./docs"
+          echo "🌐 访问地址：https://${{ github.repository_owner }}.github.io/${{ github.repository_name }}"
