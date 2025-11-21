@@ -35,7 +35,7 @@
         <!-- 头部 -->
         <header class="header">
             <h1 class="title">标签汇总</h1>
-            <p class="subtitle">共 {{ tagListJson|length }} 个标签，点击标签查看相关文章</p>
+            <p class="subtitle">共 {{ tags|length }} 个标签，点击标签查看相关文章</p>
         </header>
 
         <!-- 导航 -->
@@ -73,14 +73,25 @@
             {% endfor %}
         </nav>
 
-        <!-- 标签列表 -->
+        <!-- 标签列表：通过 postListJson 提取所有标签（无需 tagListJson） -->
+        {% set tags = {} %}
+        {% for post in postListJson.values() %}
+            {% for tag in post.labels|default([]) %}
+                {% if tag not in tags %}
+                    {% set _ = tags.__setitem__(tag, 1) %}
+                {% else %}
+                    {% set _ = tags.__setitem__(tag, tags[tag] + 1) %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
         <div class="tag-list">
-            {% for tag, posts in tagListJson.items() %}
-                <!-- 动态设置标签背景色（使用配置中的标签颜色，无则用默认色） -->
+            {% for tag, count in tags.items() %}
+                <!-- 动态设置标签背景色 -->
                 <div class="tag-item" style="background-color: {{ blogBase.labelColorDict.get(tag, '#3498db') }};">
                     <a href="{{ blogBase.homeUrl }}/tag/{{ tag }}.html" class="tag-link">
                         <span class="tag-name">{{ tag }}</span>
-                        <span class="tag-count">{{ posts|length }} 篇文章</span>
+                        <span class="tag-count">{{ count }} 篇文章</span>
                     </a>
                 </div>
             {% else %}
