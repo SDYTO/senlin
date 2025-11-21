@@ -24,7 +24,7 @@ jobs:
         id: pages
         uses: actions/configure-pages@v4  # 适配 GitHub Pages 部署
 
-      - name: 安装依赖工具（jq + Python 依赖）
+      - name: 安装依赖工具（jq）
         run: |
           # 安装 jq（用于解析 config.json）
           sudo apt-get update && sudo apt-get install -y jq
@@ -41,17 +41,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.8  # 保持原有 Python 版本（适配 Gmeek 依赖）
-          cache: "pip"  # 缓存 pip 依赖，加快安装速度
+          # 移除 cache: "pip"，避免查找 requirements.txt 报错
 
-      - name: 安装 Python 依赖
+      - name: 安装 Python 依赖（兼容无 requirements.txt 场景）
         run: |
           pip install --upgrade pip
-          # 安装本仓库根目录的 requirements.txt 依赖（而非外部仓库）
+          # 优先安装 requirements.txt 中的依赖（如果存在）
           if [ -f "requirements.txt" ]; then
             pip install -r requirements.txt
           else
-            echo "警告：未找到 requirements.txt 文件，请确认仓库中存在该依赖文件！"
-            exit 1
+            echo "未找到 requirements.txt，安装 Gmeek 常用依赖..."
+            # 请根据实际需求调整依赖列表（以下是 Gmeek 常见依赖，可按需增删）
+            pip install requests jinja2 beautifulsoup4 python-dotenv
           fi
 
       - name: 生成博客 HTML 文件
