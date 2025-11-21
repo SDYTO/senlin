@@ -70,8 +70,9 @@
                 <span class="post-date">{{ blogBase.createdDate }}</span>
                 {% if blogBase.needComment %}
                     <span class="comment-count">
+                        <!-- 修复：使用 IconList 中的 comments 图标（已通过脚本传递） -->
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="{{ IconBase.comments }}" />
+                            <path d="{{ IconList.comments }}" />
                         </svg>
                         {{ i18n.comments }}: {{ blogBase.commentNum }}
                     </span>
